@@ -1,0 +1,6 @@
+catch depends on libcurl and libxml2. Run "make" to build.
+
+Run "man ./catch.1" for usage.
+
+The source code conforms to the Linux kernel coding style:
+https://www.kernel.org/doc/Documentation/CodingStyle

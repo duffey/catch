@@ -1,0 +1,197 @@
+.TH CATCH 1 November\ X,\ 2014
+.SH NAME
+catch \- podcatcher
+.SH SYNOPSIS
+.B catch init
+.I URL
+.RI [ DIRECTORY ]
+.PP
+.B catch sync
+.RI [ DIRECTORY ]...
+.PP
+.B catch download
+.RB [ \-audn ]
+.RI [ FILE | DIRECTORY ]...
+.PP
+.B catch list
+.RB [ \-audn ]\ [ \-f
+.IR format ]\ [ FILE | DIRECTORY ]...
+.SH DESCRIPTION
+.B catch
+downloads files from RSS 2.0 feeds.
+.B catch
+ignores all
+.B item
+elements in the feed except those with an enclosed URL, for which it downloads
+files and associated metadata.
+.SH COMMANDS
+.TP
+.B init
+creates a
+.B .catch
+directory and
+.B .catch/url
+file containing
+.I URL
+in
+.IR DIRECTORY .
+.I URL
+should be the location of an RSS 2.0 feed.
+.TP
+.B sync
+For each directory specified,
+.B sync
+reads
+.B .catch/url
+to download the RSS feed, parses it into
+.B .meta
+(metadata) files stored in
+.BR .catch ,
+and creates corresponding empty download files in the directory.
+.TP
+.B download
+takes download files (created by
+.BR sync )
+or directories as arguments.
+For each directory specified,
+.B download
+processes all download files in the directory with corresponding
+.B .meta
+files in
+.BR .catch .
+For each download file, its corresponding
+.B .meta
+file in
+.B .catch
+is used to download the file.
+.TP
+.B list
+handles directories exactly as
+.B download
+does.
+For each download file,
+.B list
+may output its pathname and associated metadata (contained in its
+.B .meta
+file). The output is sorted by the download files' directory paths, 
+publication dates, and filenames in that order.
+.PP
+For all of the commands, the current working directory is processed if no file
+or directory is specified.
+.SH OPTIONS
+.TP
+.B \-a
+permits only accessed (i.e. listened/watched) files to be processed. A file is
+accessed if its access time is more recent than its modified time. See
+.BR touch (1)
+for manually setting the access time and modified time.
+.TP
+.B \-u
+permits only unaccessed (i.e. unlistened/unwatched) files to be processed.
+.TP
+.B \-d
+permits only downloaded files to be processed.
+.TP
+.B \-n
+permits only not-downloaded files to be processed.
+.TP
+.BI \-f " format"
+controls the output of the
+.B list
+command according to a
+.BR printf -like
+syntax.
+.I format
+may consist of ordinary characters, which are output unmodified, escape
+sequences, and conversion specifications. Conversion specifications are replaced
+by
+.B item
+metadata from the RSS feed, the pathname of the download file, or a percent
+character. Conversion specifications begin with the
+.B %
+character and end with a conversion character. Between the
+.B %
+character and the conversion character, the following characters are recognized:
+.RS
+.TP
+.B \-
+specifies left adjustment of the
+.B item
+metadata in its field.
+.TP
+.B *
+specifies that the
+.B item
+metadata be padded with spaces to reach the maximum field width.
+.PP
+The following are the conversion characters:
+.TP
+.B t
+specifies the
+.BR item 's
+.BR title.
+.TP
+.B u
+specifies the 
+.BR item 's
+URL
+.RB ( url ).
+.TP
+.B d
+specifies the
+.BR item 's
+.BR description.
+.TP
+.B p
+specifies the
+.BR item 's
+publication date
+.RB ( pubDate ).
+.TP
+.B f
+specifies the pathname of the download file.
+.TP
+.B %
+specifies that a
+.B %
+character be output.
+.PP
+The following are the escape sequences:
+.TP
+.B \et
+specifies that a tab character be output.
+.TP
+.B \en
+specifies that a newline character be output.
+.TP
+.B \e\e
+specifies that a backslash character be output.
+.PP
+.I format
+defaults to
+.BR """%-*f %t\en""" .
+.RE
+.SH CAVEATS
+The time zone of an
+.BR item 's
+publication date is ignored when sorting the output of the
+.B list
+command, so
+.BR item s
+published in different time zones could be output out of chronological order.
+.PP
+The number of padding space characters output by the
+.B list
+command is the difference of the maximum field width and the number of bytes in
+the text specified by the conversion character, so text with multi-byte
+characters might not align.
+.SH AUTHORS
+See the
+.B LICENSE
+file.
+.SH LICENSE
+See the
+.B LICENSE
+file.
+.SH SEE ALSO
+.BR printf (3),\  touch (1),\  truncate (1)
