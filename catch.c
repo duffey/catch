@@ -211,7 +211,7 @@ static int dofilepath(const char *filepath, int isdir)
 		if (errno != 0)
 			perror(prog);
 		else
-			fprintf(stderr, "%s: %s: parse failed\n", prog
+			fprintf(stderr, "%s: %s: Parse failed\n", prog
 				, meta_filepath);
 		free(meta_filepath);
 		free(s);
@@ -546,7 +546,7 @@ int main(int argc, char **argv)
 			}
 			free(url);
 			if (parse_rss2(*argv, filepath) < 0) {
-				fprintf(stderr, "%s: %s: parse failed\n", prog
+				fprintf(stderr, "%s: %s: Parse failed\n", prog
 					, filepath);
 				status = EXIT_FAILURE;
 			}
