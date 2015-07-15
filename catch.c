@@ -76,15 +76,19 @@ static char *read_file(const char *filepath, size_t *size)
 {
 	struct stat stbuf;
 	int fd;
+	int fail;
 	char *buf;
 
 	if (stat(filepath, &stbuf) < 0)
 		return NULL;
 	if ((fd = open(filepath, O_RDONLY, 0)) < 0)
 		return NULL;
-	if ((buf = malloc(stbuf.st_size + 1)) == NULL)
+	if ((buf = malloc(stbuf.st_size + 1)) == NULL) {
+		close(fd);
 		return NULL;
-	if (read(fd, buf, stbuf.st_size) != stbuf.st_size) {
+	}
+	fail = read(fd, buf, stbuf.st_size) != stbuf.st_size;
+	if (close(fd) < 0 || fail) {
 		free(buf);
 		return NULL;
 	}
