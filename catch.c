@@ -294,21 +294,21 @@ static void traverse(const struct item *root)
 				: *pf == 'f' ? max_filepath
 				: 0) : 0),
 				/* string/character */
-				*pf == 'n' && bs == 1 ? "\n"
-				: *pf == 't' && bs == 1 ? "\t"
-				: *pf == 't' && p == 1 ? root->title
-				: *pf == 'u' && p == 1 ? root->url
-				: *pf == 'd' && p == 1 ? root->description
-				: *pf == 'p' && p == 1 ? root->date
-				: *pf == 'f' && p == 1 ? root->filepath
-				: *pf == '%' ? (p == 1 ? "%" : "")
-				: *pf == '\\' ? (bs == 1 ? "\\" : "")
-				: *pf == '*' ? (p == 1 ? "" : "*")
-				: *pf == '-' ? (p == 1 ? "" : "-")
+				*pf == 'n' && bs ? "\n"
+				: *pf == 't' && bs ? "\t"
+				: *pf == 't' && p ? root->title
+				: *pf == 'u' && p ? root->url
+				: *pf == 'd' && p ? root->description
+				: *pf == 'p' && p ? root->date
+				: *pf == 'f' && p ? root->filepath
+				: *pf == '%' ? (p ? "%" : "")
+				: *pf == '\\' ? (bs ? "\\" : "")
+				: *pf == '*' ? (p ? "" : "*")
+				: *pf == '-' ? (p ? "" : "-")
 				: s) < 0)
 				err_exit("%s: %s\n", prog, strerror(errno));
 			p = *pf == '%' ? !p : p && (*pf == '*' || *pf == '-');
-			bs = *pf == '\\' ? !bs : 0;
+			bs = *pf == '\\' && !bs;
 			a = *pf == '*' || (p && a);
 			m = *pf == '-' || (p && m);
 		}
@@ -493,7 +493,7 @@ int main(int argc, char **argv)
 			format = optarg;
 			break;
 		default:
-			exit(EXIT_FAILURE);;
+			exit(EXIT_FAILURE);
 		}
 	argv += optind;
 	if (strcmp(command, "init") == 0) {
@@ -523,7 +523,7 @@ int main(int argc, char **argv)
 		umask(FILE_MASK);
 		for (; *argv != NULL; argv++) {
 			if ((filepath = malloc(strlen(*argv)
-				+ sizeof("/.catch/url"))) == NULL)
+				+ sizeof("/.catch/feed.xml"))) == NULL)
 				err_exit("%s: %s\n", prog, strerror(errno));
 			strcat(strcpy(filepath, *argv), "/.catch/url");
 			if ((url = read_file(filepath, NULL)) == NULL) {
@@ -533,10 +533,6 @@ int main(int argc, char **argv)
 				status = EXIT_FAILURE;
 				continue;
 			}
-			free(filepath);
-			if ((filepath = malloc(strlen(*argv)
-				+ sizeof("/.catch/feed.xml"))) == NULL)
-				err_exit("%s: %s\n", prog, strerror(errno));
 			strcat(strcpy(filepath, *argv), "/.catch/feed.xml");
 			if (download(filepath, url, 1L) < 0) {
 				free(url);
