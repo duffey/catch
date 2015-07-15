@@ -18,6 +18,7 @@
 #define DIR_MODE (FILE_MODE | S_IXUSR | S_IXGRP | S_IXOTH)
 #define	FILE_MASK (DIR_MASK | S_IXUSR | S_IXGRP | S_IXOTH)
 #define	FILE_MODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
+#define SREAD "Failed to read requested number of bytes"
 
 struct item {
 	char *filepath;
@@ -163,8 +164,8 @@ static int dofilepath(const char *filepath, int isdir)
 	}
 	if ((s = read_file(meta_filepath, &size)) == NULL) {
 		free_items(ip);
-		fprintf(stderr, "%s: %s: %s\n", prog, meta_filepath
-			, strerror(errno));
+		fprintf(stderr, "%s: %s: %s\n", prog, meta_filepath, errno == 0
+			? SREAD : strerror(errno));
 		free(meta_filepath);
 		return -2;
 	}
@@ -527,7 +528,7 @@ int main(int argc, char **argv)
 			strcat(strcpy(filepath, *argv), "/.catch/url");
 			if ((url = read_file(filepath, NULL)) == NULL) {
 				fprintf(stderr, "%s: %s: %s\n", prog, filepath
-					, strerror(errno));
+					, errno == 0 ? SREAD : strerror(errno));
 				free(filepath);
 				status = EXIT_FAILURE;
 				continue;
